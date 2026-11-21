@@ -1,0 +1,629 @@
+<title>LMS Konfigurasi Elektron</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: satu kolom sempit seperti buku catatan lab. Header + tab menu, lalu satu panel aktif.
+   Warna subkulit (s, p, d, f) dipakai konsisten di tile unsur, diagram orbital, dan tabel. */
+:root {
+  --bg: #F2F5F9; --surface: #FFFFFF; --ink: #14213A; --muted: #566782; --line: #D6DEE9; --soft: #E8EDF4;
+  --btn: #14213A; --btn-ink: #FFFFFF;
+  --s: #C8451C; --s-bg: #FBE9E2;
+  --p: #1F5FD1; --p-bg: #E3ECFB;
+  --d: #13845F; --d-bg: #DDF2EA;
+  --f: #7B3FC4; --f-bg: #EEE4F9;
+  --ok: #16794F; --ok-bg: #DDF2E8; --bad: #B3302B; --bad-bg: #FBE4E2;
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1524; --surface: #152036; --ink: #E7EEF9; --muted: #9BABC3; --line: #283A56; --soft: #1C2A44;
+    --btn: #E7EEF9; --btn-ink: #0D1524;
+    --s: #FF8A5E; --s-bg: #3A2219; --p: #6FA2FF; --p-bg: #172B4F; --d: #4CD1A0; --d-bg: #133A2E; --f: #BE91F5; --f-bg: #2D1F47;
+    --ok: #4CD1A0; --ok-bg: #133A2E; --bad: #FF8B84; --bad-bg: #40201F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1524; --surface: #152036; --ink: #E7EEF9; --muted: #9BABC3; --line: #283A56; --soft: #1C2A44;
+  --btn: #E7EEF9; --btn-ink: #0D1524;
+  --s: #FF8A5E; --s-bg: #3A2219; --p: #6FA2FF; --p-bg: #172B4F; --d: #4CD1A0; --d-bg: #133A2E; --f: #BE91F5; --f-bg: #2D1F47;
+  --ok: #4CD1A0; --ok-bg: #133A2E; --bad: #FF8B84; --bad-bg: #40201F;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.65 var(--font-body); }
+.wrap { max-width: 800px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.2; text-wrap: balance; margin: 0; }
+h2 { font-size: 24px; margin-bottom: 8px; }
+h3 { font-size: 17px; margin: 22px 0 8px; }
+p { margin: 0 0 12px; }
+sup, sub { font-size: .72em; line-height: 0; }
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--muted); }
+.kicker { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; font-weight: 600; }
+.brand { font-size: 30px; letter-spacing: -.01em; }
+.prog { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.bar { flex: 1; height: 8px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--d); transition: width .3s; }
+#pct { font-family: var(--font-mono); font-size: 13px; min-width: 3.5ch; text-align: right; }
+
+.tabs { display: flex; gap: 2px; margin-top: 16px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tabs a { flex: 1 0 auto; text-align: center; padding: 10px 12px; color: var(--muted); text-decoration: none; font-weight: 500; font-size: 14px; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid var(--p); outline-offset: 2px; }
+
+.view { padding-top: 24px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.stack { display: grid; gap: 14px; }
+ul.plain, ol.plain { margin: 0; padding-left: 20px; }
+ul.plain li, ol.plain li { margin-bottom: 6px; }
+
+label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+input[type="text"] { width: 100%; font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.cfg-input { font-family: var(--font-mono); font-size: 15px; }
+.btn { font: inherit; font-weight: 600; font-size: 14px; background: var(--btn); color: var(--btn-ink); border: 0; border-radius: 8px; padding: 10px 16px; cursor: pointer; text-decoration: none; display: inline-block; }
+.btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.miles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.mile { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-size: 14px; display: flex; gap: 8px; align-items: center; background: var(--surface); }
+.mile .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; font-size: 11px; line-height: 1; }
+.mile.done { border-color: var(--ok); background: var(--ok-bg); }
+.mile.done .dot { border-color: var(--ok); background: var(--ok); color: var(--surface); }
+
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; }
+summary { cursor: pointer; padding: 14px 16px; font-family: var(--font-display); font-weight: 600; font-size: 16px; list-style: none; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; font-family: var(--font-mono); font-size: 20px; color: var(--muted); }
+details[open] > summary::after { content: "–"; }
+details > .body { padding: 0 16px 16px; }
+.tbl-wrap { overflow-x: auto; margin: 8px 0 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; padding: 0; list-style: none; }
+.chips li { font-family: var(--font-mono); font-size: 14px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); }
+.chips li small { color: var(--muted); font-size: 11px; margin-right: 6px; }
+.chips li.s, .chip-s { color: var(--s); background: var(--s-bg); border-color: transparent; }
+.chips li.p, .chip-p { color: var(--p); background: var(--p-bg); border-color: transparent; }
+.chips li.d, .chip-d { color: var(--d); background: var(--d-bg); border-color: transparent; }
+.chips li.f, .chip-f { color: var(--f); background: var(--f-bg); border-color: transparent; }
+.note { border-left: 3px solid var(--p); background: var(--p-bg); padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 14px; margin: 12px 0; }
+.note.warn { border-left-color: var(--s); background: var(--s-bg); }
+
+/* Diagram orbital */
+.odia { display: flex; flex-wrap: wrap; gap: 14px 18px; margin: 10px 0; }
+.og { --c: var(--ink); padding: 6px; border-radius: 8px; border: 2px solid transparent; }
+.og.s { --c: var(--s); } .og.p { --c: var(--p); } .og.d { --c: var(--d); } .og.f { --c: var(--f); }
+.og.hl { border-color: var(--c); background: var(--surface); }
+.olab { display: block; font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--c); margin-bottom: 4px; }
+.obx { display: flex; gap: 3px; }
+.ob { width: 34px; height: 40px; border: 2px solid var(--c); border-radius: 6px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 17px; color: var(--c); letter-spacing: -2px; background: var(--surface); }
+
+/* Simulasi */
+.sim-top { display: grid; grid-template-columns: 124px 1fr; gap: 16px; align-items: stretch; }
+.tile { --c: var(--ink); --cb: var(--soft); border: 2px solid var(--c); background: var(--cb); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between; min-height: 132px; }
+.tile .z { font-family: var(--font-mono); font-size: 14px; font-weight: 600; color: var(--c); }
+.tile .sym { font-family: var(--font-display); font-weight: 700; font-size: 52px; line-height: 1; color: var(--c); }
+.tile .nm { font-size: 13px; font-weight: 500; }
+.blk-s { --c: var(--s); --cb: var(--s-bg); } .blk-p { --c: var(--p); --cb: var(--p-bg); } .blk-d { --c: var(--d); --cb: var(--d-bg); } .blk-f { --c: var(--f); --cb: var(--f-bg); }
+.ctrl { display: flex; flex-direction: column; gap: 10px; justify-content: center; min-width: 0; }
+.step { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.egrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 5px; margin: 14px 0; }
+.egrid button { font: inherit; border: 2px solid transparent; border-radius: 6px; background: var(--cb); color: var(--c); padding: 3px 0 4px; cursor: pointer; display: grid; line-height: 1.15; }
+.egrid button small { font-family: var(--font-mono); font-size: 10px; opacity: .85; }
+.egrid button b { font-family: var(--font-display); font-size: 15px; }
+.egrid button[aria-pressed="true"] { border-color: var(--c); background: var(--surface); }
+.legend { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; font-family: var(--font-mono); }
+.legend span { padding: 2px 8px; border-radius: 5px; }
+dl.facts { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr); gap: 0; margin: 0; font-size: 14px; }
+dl.facts dt, dl.facts dd { margin: 0; padding: 9px 0; border-bottom: 1px solid var(--line); }
+dl.facts dt { color: var(--muted); padding-right: 10px; }
+dl.facts dd { font-family: var(--font-mono); overflow-wrap: anywhere; }
+
+/* Latihan dan kuis */
+.q { margin-bottom: 14px; }
+.fb { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+.fb.ok { background: var(--ok-bg); color: var(--ok); }
+.fb.bad { background: var(--bad-bg); color: var(--bad); }
+.fb.info { background: var(--soft); color: var(--ink); }
+.opts { display: grid; gap: 8px; margin: 14px 0; }
+.opt { font: inherit; text-align: left; display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.opt .l { font-family: var(--font-mono); font-weight: 600; color: var(--muted); }
+.opt.right { border-color: var(--ok); background: var(--ok-bg); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt[disabled] { cursor: default; }
+.qhead { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.score { font-family: var(--font-display); font-size: 64px; font-weight: 700; line-height: 1; }
+footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+
+@media (max-width: 460px) {
+  .sim-top { grid-template-columns: 1fr; }
+  .tile { flex-direction: row; align-items: center; min-height: 0; gap: 12px; }
+  .brand { font-size: 26px; }
+  dl.facts { grid-template-columns: 1fr; }
+  dl.facts dt { border-bottom: 0; padding-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="kicker">Kimia · Kelas X · Fase E</p>
+    <h1 class="brand">Konfigurasi Elektron</h1>
+    <div class="prog" aria-label="Kemajuan belajar">
+      <div class="bar"><i id="barFill"></i></div>
+      <span id="pct">0%</span>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Menu">
+    <a href="#beranda" data-v="beranda">Beranda</a>
+    <a href="#materi" data-v="materi">Materi</a>
+    <a href="#simulasi" data-v="simulasi">Simulasi</a>
+    <a href="#latihan" data-v="latihan">Latihan</a>
+    <a href="#kuis" data-v="kuis">Kuis</a>
+  </nav>
+
+  <main>
+    <!-- BERANDA -->
+    <section id="v-beranda" class="view">
+      <h2>Selamat datang</h2>
+      <p>Di sini kamu belajar menuliskan susunan elektron sebuah atom, lalu menghubungkannya dengan letak unsur itu di tabel periodik. Semua bagian bisa dikerjakan langsung di halaman ini.</p>
+      <div class="stack">
+        <div class="card">
+          <label for="nama">Nama kamu</label>
+          <input type="text" id="nama" autocomplete="name" placeholder="Ketik namamu, nanti muncul di nilai kuis">
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Tujuan pembelajaran</h3>
+          <ul class="plain">
+            <li>Menentukan jumlah elektron maksimum pada kulit dan subkulit.</li>
+            <li>Menuliskan konfigurasi elektron dengan asas Aufbau, larangan Pauli, dan kaidah Hund.</li>
+            <li>Menggambar diagram orbital dan menghitung elektron tidak berpasangan.</li>
+            <li>Menentukan elektron valensi, golongan, dan periode dari konfigurasi elektron.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0">Alur belajar</h3>
+          <ol class="plain">
+            <li>Baca <a href="#materi">Materi</a> sampai kelima bagiannya terbuka.</li>
+            <li>Coba <a href="#simulasi">Simulasi</a> untuk melihat elektron mengisi orbital.</li>
+            <li>Kerjakan <a href="#latihan">Latihan</a> menulis konfigurasi sendiri.</li>
+            <li>Uji pemahamanmu di <a href="#kuis">Kuis</a>.</li>
+          </ol>
+        </div>
+        <div>
+          <h3 style="margin-top:0">Kemajuanmu</h3>
+          <div class="miles" id="miles"></div>
+          <p class="muted" style="font-size:13px;margin-top:10px">Kemajuan tersimpan di perangkat ini saja.</p>
+        </div>
+        <div><a class="btn" href="#materi">Mulai belajar</a></div>
+      </div>
+    </section>
+
+    <!-- MATERI -->
+    <section id="v-materi" class="view" hidden>
+      <h2>Materi</h2>
+      <p class="muted">Buka kelima bagian di bawah ini.</p>
+
+      <details data-i="0">
+        <summary>1. Kulit dan subkulit</summary>
+        <div class="body">
+          <p>Elektron mengelilingi inti pada tingkat energi yang disebut kulit, dengan nomor n = 1, 2, 3, dan seterusnya (kulit K, L, M, N). Kulit ke-n memiliki n subkulit dan menampung paling banyak 2n² elektron.</p>
+          <div class="tbl-wrap"><table>
+            <tr><th>Kulit</th><th>n</th><th>Subkulit</th><th>Elektron maks.</th></tr>
+            <tr><td>K</td><td>1</td><td class="mono">1s</td><td>2</td></tr>
+            <tr><td>L</td><td>2</td><td class="mono">2s 2p</td><td>8</td></tr>
+            <tr><td>M</td><td>3</td><td class="mono">3s 3p 3d</td><td>18</td></tr>
+            <tr><td>N</td><td>4</td><td class="mono">4s 4p 4d 4f</td><td>32</td></tr>
+          </table></div>
+          <p>Setiap subkulit terdiri dari orbital. Satu orbital menampung paling banyak 2 elektron.</p>
+          <div class="tbl-wrap"><table>
+            <tr><th>Subkulit</th><th>Jumlah orbital</th><th>Elektron maks.</th></tr>
+            <tr><td class="mono" style="color:var(--s)">s</td><td>1</td><td>2</td></tr>
+            <tr><td class="mono" style="color:var(--p)">p</td><td>3</td><td>6</td></tr>
+            <tr><td class="mono" style="color:var(--d)">d</td><td>5</td><td>10</td></tr>
+            <tr><td class="mono" style="color:var(--f)">f</td><td>7</td><td>14</td></tr>
+          </table></div>
+        </div>
+      </details>
+
+      <details data-i="1">
+        <summary>2. Asas Aufbau</summary>
+        <div class="body">
+          <p>Elektron mengisi subkulit yang energinya paling rendah lebih dulu. Energi subkulit naik menurut nilai n + l, dengan l bernilai 0 untuk s, 1 untuk p, 2 untuk d, dan 3 untuk f. Jika n + l sama, subkulit dengan n lebih kecil punya energi lebih rendah.</p>
+          <p>Contoh: 4s memiliki n + l = 4 + 0 = 4, sedangkan 3d memiliki n + l = 3 + 2 = 5. Karena itu 4s terisi lebih dulu daripada 3d.</p>
+          <p style="margin-bottom:0"><b>Urutan pengisian:</b></p>
+          <ol class="chips" id="aufbauChips"></ol>
+        </div>
+      </details>
+
+      <details data-i="2">
+        <summary>3. Larangan Pauli</summary>
+        <div class="body">
+          <p>Satu orbital paling banyak berisi 2 elektron, dan keduanya harus berlawanan arah spin. Dua elektron dalam satu atom tidak boleh memiliki keempat bilangan kuantum yang sama.</p>
+          <p style="margin-bottom:0">Contoh: orbital 1s pada atom He berisi sepasang elektron.</p>
+          <div class="odia" id="exPauli"></div>
+        </div>
+      </details>
+
+      <details data-i="3">
+        <summary>4. Kaidah Hund</summary>
+        <div class="body">
+          <p>Orbital yang tingkat energinya sama (misalnya tiga orbital 2p) diisi satu elektron lebih dulu dengan arah spin sama. Elektron baru berpasangan setelah semua orbital terisi satu.</p>
+          <p style="margin-bottom:0">Contoh: subkulit 2p pada N (3 elektron) dan O (4 elektron).</p>
+          <div class="odia" id="exHund"></div>
+          <p class="muted" style="font-size:13px">N memiliki 3 elektron tidak berpasangan. O memiliki 2 elektron tidak berpasangan.</p>
+        </div>
+      </details>
+
+      <details data-i="4">
+        <summary>5. Penyimpangan, notasi singkat, dan letak unsur</summary>
+        <div class="body">
+          <h3 style="margin-top:4px">Penyimpangan</h3>
+          <p>Subkulit d yang terisi setengah penuh (d⁵) atau penuh (d¹⁰) lebih stabil. Akibatnya satu elektron 4s berpindah ke 3d pada dua unsur periode 4.</p>
+          <ul class="plain">
+            <li><span class="mono">₂₄Cr</span> : [Ar] 4s<sup>1</sup> 3d<sup>5</sup> (bukan 4s² 3d⁴)</li>
+            <li><span class="mono">₂₉Cu</span> : [Ar] 4s<sup>1</sup> 3d<sup>10</sup> (bukan 4s² 3d⁹)</li>
+          </ul>
+          <h3>Notasi singkat</h3>
+          <p>Bagian konfigurasi yang sama dengan gas mulia (He, Ne, Ar, Kr) ditulis dalam kurung siku. Contoh: <span class="mono">₁₁Na</span> = [Ne] 3s<sup>1</sup>.</p>
+          <h3>Letak dalam tabel periodik</h3>
+          <ul class="plain">
+            <li>Periode = nomor kulit terbesar yang terisi.</li>
+            <li>Unsur blok s: golongan = jumlah elektron di ns. Unsur blok p: golongan = 10 + (elektron ns + np). Unsur blok d: golongan = elektron ns + (n−1)d.</li>
+            <li>Elektron valensi unsur golongan utama = elektron pada kulit terluar.</li>
+          </ul>
+          <div class="note"><b>Contoh <span class="mono">₂₆Fe</span>.</b> 1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶, atau [Ar] 4s² 3d⁶. Kulit terluar n = 4, jadi periode 4. Blok d dengan 2 + 6 = 8, jadi golongan 8 (VIIIB). Ada 4 elektron tidak berpasangan pada 3d.</div>
+        </div>
+      </details>
+    </section>
+
+    <!-- SIMULASI -->
+    <section id="v-simulasi" class="view" hidden>
+      <h2>Simulasi pengisian elektron</h2>
+      <p class="muted">Pilih unsur dari nomor atom 1 sampai 36, lalu tekan Putar pengisian untuk melihat elektron masuk satu per satu.</p>
+
+      <div class="sim-top">
+        <div class="tile" id="tile">
+          <span class="z" id="tZ">26</span>
+          <span class="sym" id="tSym">Fe</span>
+          <span class="nm" id="tName">Besi</span>
+        </div>
+        <div class="ctrl">
+          <div class="row">
+            <button class="btn ghost" id="prev" type="button" aria-label="Unsur sebelumnya">−</button>
+            <button class="btn ghost" id="next" type="button" aria-label="Unsur berikutnya">+</button>
+            <button class="btn" id="play" type="button">Putar pengisian</button>
+          </div>
+          <div class="step" id="stepTxt"></div>
+        </div>
+      </div>
+
+      <div class="egrid" id="egrid" role="group" aria-label="Pilih unsur"></div>
+      <div class="legend">
+        <span class="chip-s">blok s</span><span class="chip-p">blok p</span><span class="chip-d">blok d</span>
+      </div>
+
+      <h3>Diagram orbital</h3>
+      <div class="odia" id="simDia"></div>
+      <div id="simNote"></div>
+
+      <h3>Data unsur</h3>
+      <div class="card" style="padding-top:4px;padding-bottom:4px"><dl class="facts" id="facts"></dl></div>
+    </section>
+
+    <!-- LATIHAN -->
+    <section id="v-latihan" class="view" hidden>
+      <h2>Latihan</h2>
+      <p>Tulis konfigurasi elektron tiap atom. Pisahkan subkulit dengan spasi dan tulis jumlah elektron setelah huruf subkulit, misalnya <span class="mono">1s2 2s2 2p6 3s1</span>. Notasi singkat seperti <span class="mono">[Ne] 3s1</span> juga diterima.</p>
+      <div class="stack" id="latBox"></div>
+    </section>
+
+    <!-- KUIS -->
+    <section id="v-kuis" class="view" hidden>
+      <h2>Kuis</h2>
+      <div class="card" id="quizBox"></div>
+    </section>
+  </main>
+
+  <footer>Media pembelajaran Kimia Fase E. Kemajuan dan nilai hanya tersimpan di peramban perangkat ini.</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  /* ---------- Data dan logika kimia ---------- */
+  var ORDER = ['1s', '2s', '2p', '3s', '3p', '4s', '3d', '4p'];
+  var CAP = { s: 2, p: 6, d: 10, f: 14 };
+  var NORB = { s: 1, p: 3, d: 5, f: 7 };
+  var EL = ['H|Hidrogen', 'He|Helium', 'Li|Litium', 'Be|Berilium', 'B|Boron', 'C|Karbon', 'N|Nitrogen', 'O|Oksigen', 'F|Fluorin', 'Ne|Neon',
+    'Na|Natrium', 'Mg|Magnesium', 'Al|Aluminium', 'Si|Silikon', 'P|Fosfor', 'S|Belerang', 'Cl|Klorin', 'Ar|Argon',
+    'K|Kalium', 'Ca|Kalsium', 'Sc|Skandium', 'Ti|Titanium', 'V|Vanadium', 'Cr|Kromium', 'Mn|Mangan', 'Fe|Besi', 'Co|Kobalt', 'Ni|Nikel', 'Cu|Tembaga', 'Zn|Seng',
+    'Ga|Galium', 'Ge|Germanium', 'As|Arsen', 'Se|Selenium', 'Br|Bromin', 'Kr|Kripton'].map(function (s) { var a = s.split('|'); return { sym: a[0], name: a[1] }; });
+  var EXC = { 24: { '4s': 1, '3d': 5 }, 29: { '4s': 1, '3d': 10 } };
+  var NOBLE = [[2, 'He'], [10, 'Ne'], [18, 'Ar'], [36, 'Kr']];
+  var ROMAN = { 1: 'IA', 2: 'IIA', 3: 'IIIB', 4: 'IVB', 5: 'VB', 6: 'VIB', 7: 'VIIB', 8: 'VIIIB', 9: 'VIIIB', 10: 'VIIIB', 11: 'IB', 12: 'IIB', 13: 'IIIA', 14: 'IVA', 15: 'VA', 16: 'VIA', 17: 'VIIA', 18: 'VIIIA' };
+  var SUBD = '₀₁₂₃₄₅₆₇₈₉';
+
+  function fill(n) {
+    var c = {}, left = n;
+    ORDER.forEach(function (k) {
+      var t = Math.min(CAP[k[1]], left);
+      if (t > 0) { c[k] = t; left -= t; }
+    });
+    return c;
+  }
+  function config(z, upto) {
+    var n = upto == null ? z : upto;
+    var c = fill(n);
+    if (n === z && EXC[z]) { Object.keys(EXC[z]).forEach(function (k) { c[k] = EXC[z][k]; }); }
+    return c;
+  }
+  function entries(c) { return ORDER.filter(function (k) { return c[k]; }).map(function (k) { return [k, c[k]]; }); }
+  function fmt(en) { return en.map(function (e) { return e[0] + '<sup>' + e[1] + '</sup>'; }).join(' '); }
+  function boxes(k, count) {
+    var n = NORB[k[1]], o = [], i;
+    for (i = 0; i < n; i++) o.push(0);
+    for (i = 0; i < count; i++) { if (i < n) o[i] = 1; else o[i - n] = 2; }
+    return o;
+  }
+  function info(z) {
+    var c = config(z), en = entries(c), coreZ = 0, core = '';
+    NOBLE.forEach(function (n) { if (n[0] < z) { coreZ = n[0]; core = n[1]; } });
+    var cc = fill(coreZ), rest = [];
+    en.forEach(function (e) { var r = e[1] - (cc[e[0]] || 0); if (r > 0) rest.push([e[0], r]); });
+    var period = 0, shells = {}, unpaired = 0;
+    en.forEach(function (e) {
+      var n = +e[0][0]; if (n > period) period = n;
+      shells[n] = (shells[n] || 0) + e[1];
+      boxes(e[0], e[1]).forEach(function (b) { if (b === 1) unpaired++; });
+    });
+    var block = en[en.length - 1][0][1], group, valence, valTxt;
+    var ns = c[period + 's'] || 0, np = c[period + 'p'] || 0;
+    if (block === 's') { group = z === 2 ? 18 : ns; valence = ns; valTxt = String(valence); }
+    else if (block === 'p') { group = 10 + ns + np; valence = ns + np; valTxt = String(valence); }
+    else { var nd = c[(period - 1) + 'd'] || 0; group = ns + nd; valence = group; valTxt = valence + ' (' + period + 's dan ' + (period - 1) + 'd)'; }
+    var sh = Object.keys(shells).map(function (n) { return shells[n]; }).join(', ');
+    return { z: z, c: c, en: en, full: fmt(en), short: core ? '[' + core + '] ' + fmt(rest) : fmt(en), period: period, block: block, group: group, roman: ROMAN[group], valTxt: valTxt, shells: sh, unpaired: unpaired };
+  }
+  function symZ(z) { return String(z).split('').map(function (d) { return SUBD[+d]; }).join(''); }
+  function groupHTML(k, count, hl) {
+    var o = boxes(k, count);
+    return '<div class="og ' + k[1] + (hl ? ' hl' : '') + '"><span class="olab">' + k + '<sup>' + count + '</sup></span><div class="obx">' +
+      o.map(function (v) { return '<span class="ob">' + (v === 2 ? '↑↓' : v === 1 ? '↑' : '') + '</span>'; }).join('') + '</div></div>';
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+
+  /* ---------- Penyimpanan lokal (aman bila diblokir) ---------- */
+  var KEY = 'lms-kimia-konfigurasi-elektron', mem = {};
+  try { var raw = localStorage.getItem(KEY); if (raw) mem = JSON.parse(raw) || {}; } catch (e) { mem = {}; }
+  mem.mat = mem.mat || {}; mem.sims = mem.sims || {}; mem.lat = mem.lat || {}; mem.quiz = mem.quiz || {};
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(mem)); } catch (e) { /* diabaikan */ } }
+  var count = function (o) { return Object.keys(o).length; };
+
+  function updateProgress() {
+    var m = [
+      { t: 'Materi dibaca', d: count(mem.mat) >= 5 },
+      { t: 'Simulasi dicoba', d: count(mem.sims) >= 3 },
+      { t: 'Latihan (3 dari 4 benar)', d: count(mem.lat) >= 3 },
+      { t: 'Kuis selesai', d: !!mem.quiz.done }
+    ];
+    var done = m.filter(function (x) { return x.d; }).length;
+    $('#barFill').style.width = (done * 25) + '%';
+    $('#pct').textContent = (done * 25) + '%';
+    $('#miles').innerHTML = m.map(function (x) {
+      return '<div class="mile' + (x.d ? ' done' : '') + '"><span class="dot">' + (x.d ? '✓' : '') + '</span>' + x.t + '</div>';
+    }).join('');
+  }
+
+  /* ---------- Navigasi ---------- */
+  var VIEWS = ['beranda', 'materi', 'simulasi', 'latihan', 'kuis'];
+  function route() {
+    var h = (location.hash || '').slice(1);
+    show(VIEWS.indexOf(h) >= 0 ? h : 'beranda');
+  }
+  function show(v) {
+    VIEWS.forEach(function (n) { $('#v-' + n).hidden = n !== v; });
+    document.querySelectorAll('.tabs a').forEach(function (a) {
+      if (a.dataset.v === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+    });
+    if (v !== 'simulasi') stopPlay();
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', route);
+  /* Menu dan tautan internal dijalankan langsung lewat klik, tanpa bergantung pada hash,
+     agar tetap berfungsi di dalam kotak embed Google Sites. */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest('a[href^="#"]');
+    if (!a) return;
+    var v = a.getAttribute('href').slice(1);
+    if (VIEWS.indexOf(v) < 0) return;
+    ev.preventDefault();
+    show(v);
+    try { history.replaceState(null, '', '#' + v); } catch (e) { /* diabaikan */ }
+  });
+
+  /* ---------- Beranda ---------- */
+  var nama = $('#nama');
+  nama.value = mem.name || '';
+  nama.addEventListener('input', function () { mem.name = nama.value; save(); });
+
+  /* ---------- Materi ---------- */
+  $('#aufbauChips').innerHTML = ['1s', '2s', '2p', '3s', '3p', '4s', '3d', '4p', '5s', '4d', '5p', '6s'].map(function (k, i) {
+    return '<li class="' + k[1] + '"><small>' + (i + 1) + '</small>' + k + '</li>';
+  }).join('');
+  $('#exPauli').innerHTML = groupHTML('1s', 2, true);
+  $('#exHund').innerHTML = '<div><span class="muted mono" style="font-size:12px">7N</span>' + groupHTML('2p', 3, true) + '</div><div><span class="muted mono" style="font-size:12px">8O</span>' + groupHTML('2p', 4, true) + '</div>';
+  document.querySelectorAll('details[data-i]').forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) { mem.mat[d.dataset.i] = 1; save(); updateProgress(); }
+    });
+  });
+
+  /* ---------- Simulasi ---------- */
+  var sim = { z: 26, upto: 26, timer: null };
+  var egrid = $('#egrid');
+  egrid.innerHTML = EL.map(function (e, i) {
+    var z = i + 1, b = info(z).block;
+    return '<button type="button" class="blk-' + b + '" data-z="' + z + '" aria-pressed="false" aria-label="' + e.name + ', nomor atom ' + z + '"><small>' + z + '</small><b>' + e.sym + '</b></button>';
+  }).join('');
+  function stopPlay() {
+    if (sim.timer) { clearInterval(sim.timer); sim.timer = null; }
+    $('#play').textContent = 'Putar pengisian';
+  }
+  function renderSim() {
+    var z = sim.z, e = EL[z - 1], I = info(z);
+    $('#tile').className = 'tile blk-' + I.block;
+    $('#tZ').textContent = z; $('#tSym').textContent = e.sym; $('#tName').textContent = e.name;
+    egrid.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.z === z)); });
+    var c = config(z, sim.upto), prev = sim.upto > 0 ? config(z, sim.upto - 1) : {};
+    var html = entries(c).map(function (en) {
+      return groupHTML(en[0], en[1], sim.timer && en[1] !== (prev[en[0]] || 0));
+    }).join('');
+    $('#simDia').innerHTML = html || '<span class="muted">Belum ada elektron.</span>';
+    $('#stepTxt').textContent = 'Elektron terisi: ' + sim.upto + ' dari ' + z;
+    $('#simNote').innerHTML = EXC[z] ? '<div class="note warn"><b>Penyimpangan.</b> Satu elektron dari 4s berpindah ke 3d karena 3d' + (z === 24 ? ' setengah penuh (d⁵)' : ' penuh (d¹⁰)') + ' lebih stabil. Pada elektron terakhir, perhatikan 4s dan 3d berubah bersamaan.</div>' : '';
+    $('#facts').innerHTML = [
+      ['Konfigurasi lengkap', I.full], ['Notasi singkat', I.short], ['Elektron per kulit', I.shells + ' (K, L, ...)'],
+      ['Elektron valensi', I.valTxt], ['Periode', I.period], ['Golongan', I.group + ' (' + I.roman + ')'], ['Blok', I.block],
+      ['Tidak berpasangan', I.unpaired]
+    ].map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + r[1] + '</dd>'; }).join('');
+  }
+  function pick(z) {
+    stopPlay();
+    sim.z = Math.max(1, Math.min(36, z)); sim.upto = sim.z;
+    mem.sims[sim.z] = 1; save(); updateProgress(); renderSim();
+  }
+  egrid.addEventListener('click', function (ev) { var b = ev.target.closest('button[data-z]'); if (b) pick(+b.dataset.z); });
+  $('#prev').addEventListener('click', function () { pick(sim.z - 1); });
+  $('#next').addEventListener('click', function () { pick(sim.z + 1); });
+  $('#play').addEventListener('click', function () {
+    if (sim.timer) { stopPlay(); sim.upto = sim.z; renderSim(); return; }
+    sim.upto = 0; $('#play').textContent = 'Hentikan';
+    sim.timer = setInterval(function () {
+      if (sim.upto >= sim.z) { stopPlay(); renderSim(); return; }
+      sim.upto++; renderSim();
+    }, 400);
+    renderSim();
+  });
+
+  /* ---------- Latihan ---------- */
+  var LAT = [
+    { z: 9, hint: 'Fluorin punya 9 elektron. Isi 1s, lalu 2s, lalu 2p.' },
+    { z: 15, hint: 'Ada 15 elektron. Setelah 3s terisi, lanjut ke 3p.' },
+    { z: 20, hint: 'Setelah 3p penuh, subkulit berikutnya adalah 4s.' },
+    { z: 29, hint: 'Tembaga menyimpang: subkulit 3d lebih stabil jika terisi penuh.' }
+  ];
+  var SUPMAP = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9' };
+  function parse(str) {
+    var s = str.toLowerCase().replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, function (ch) { return SUPMAP[ch]; }).replace(/[\s^_{}]/g, '');
+    if (!s) return null;
+    var res = {}, m = s.match(/^\[(he|ne|ar|kr)\]/);
+    if (m) {
+      var base = fill({ he: 2, ne: 10, ar: 18, kr: 36 }[m[1]]);
+      Object.keys(base).forEach(function (k) { res[k] = base[k]; });
+      s = s.slice(m[0].length);
+    }
+    var re = /(\d)([spdf])(\d{1,2}?)(?=\d[spdf]|$)/g, r, used = '';
+    while ((r = re.exec(s))) { var k = r[1] + r[2]; res[k] = (res[k] || 0) + (+r[3]); used += r[0]; }
+    if (used !== s) return null;
+    return res;
+  }
+  function total(o) { return Object.keys(o).reduce(function (a, k) { return a + o[k]; }, 0); }
+  function same(a, b) {
+    var keys = Object.keys(a).concat(Object.keys(b));
+    return keys.every(function (k) { return (a[k] || 0) === (b[k] || 0); });
+  }
+  $('#latBox').innerHTML = LAT.map(function (it, i) {
+    var e = EL[it.z - 1];
+    return '<form class="card q" data-i="' + i + '" novalidate>' +
+      '<label for="lat' + i + '">' + (i + 1) + '. Konfigurasi elektron <span style="font-family:var(--font-display)"><sub>' + it.z + '</sub>' + e.sym + '</span> (' + e.name + ')</label>' +
+      '<input type="text" class="cfg-input" id="lat' + i + '" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="1s2 2s2 ...">' +
+      '<div class="row" style="margin-top:10px"><button class="btn" type="submit">Periksa</button>' +
+      '<button class="btn ghost" type="button" data-act="hint">Petunjuk</button>' +
+      '<button class="btn ghost" type="button" data-act="ans" disabled>Lihat jawaban</button></div>' +
+      '<div class="fb-slot" id="fb' + i + '" aria-live="polite"></div></form>';
+  }).join('');
+  function setFb(i, cls, html) { $('#fb' + i).innerHTML = '<div class="fb ' + cls + '">' + html + '</div>'; }
+  $('#latBox').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var f = ev.target, i = +f.dataset.i, it = LAT[i], exp = config(it.z), got = parse($('#lat' + i).value);
+    f.querySelector('[data-act="ans"]').disabled = false;
+    if (!got) { setFb(i, 'bad', 'Format belum terbaca. Tulis tiap subkulit diikuti jumlah elektronnya, misalnya 2p6, dan pisahkan dengan spasi.'); return; }
+    if (total(got) !== it.z) { setFb(i, 'bad', 'Jumlah elektron harus ' + it.z + ', sedangkan jawabanmu berjumlah ' + total(got) + '.'); return; }
+    if (same(got, exp)) {
+      mem.lat[i] = 1; save(); updateProgress();
+      setFb(i, 'ok', 'Benar. ' + info(it.z).full);
+    } else {
+      setFb(i, 'bad', 'Jumlah elektron sudah sesuai, tetapi pengisian subkulitnya belum tepat. Periksa urutan Aufbau dan kapasitas tiap subkulit.');
+    }
+  });
+  $('#latBox').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button[data-act]'); if (!b) return;
+    var f = b.closest('form'), i = +f.dataset.i, I = info(LAT[i].z);
+    if (b.dataset.act === 'hint') setFb(i, 'info', LAT[i].hint);
+    if (b.dataset.act === 'ans') setFb(i, 'info', 'Jawaban: <span class="mono">' + I.full + '</span><br>Notasi singkat: <span class="mono">' + I.short + '</span>');
+  });
+
+  /* ---------- Kuis ---------- */
+  var QS = [
+    { q: 'Berapa elektron maksimum yang dapat ditampung subkulit d?', o: ['6', '10', '14', '18'], a: 1, e: 'Subkulit d memiliki 5 orbital, dan tiap orbital menampung 2 elektron, jadi 10 elektron.' },
+    { q: 'Urutan pengisian subkulit yang benar adalah ...', o: ['1s 2s 2p 3s 3p 3d 4s', '1s 2s 2p 3s 3p 4s 3d', '1s 2s 3s 2p 3p 4s 3d', '1s 2s 2p 3s 4s 3p 3d'], a: 1, e: 'Menurut asas Aufbau, 4s (n + l = 4) berenergi lebih rendah daripada 3d (n + l = 5), sehingga 4s terisi lebih dulu.' },
+    { q: 'Konfigurasi elektron atom <sub>11</sub>Na adalah ...', o: ['1s² 2s² 2p⁵ 3s²', '1s² 2s⁸ 3s¹', '1s² 2s² 2p⁶ 3s¹', '1s² 2s² 2p⁶ 3p¹'], a: 2, e: 'Na memiliki 11 elektron: 2 + 2 + 6 = 10 elektron mengisi 1s, 2s, 2p, dan 1 elektron sisanya masuk ke 3s.' },
+    { q: 'Pernyataan yang sesuai dengan larangan Pauli adalah ...', o: ['Elektron mengisi subkulit berenergi terendah lebih dulu.', 'Elektron mengisi orbital setingkat satu per satu sebelum berpasangan.', 'Satu orbital berisi paling banyak dua elektron dengan spin berlawanan.', 'Subkulit d dapat menampung 14 elektron.'], a: 2, e: 'Pilihan pertama adalah asas Aufbau, pilihan kedua adalah kaidah Hund. Larangan Pauli membatasi satu orbital maksimal 2 elektron dengan spin berlawanan.' },
+    { q: 'Diagram orbital subkulit 2p atom <sub>6</sub>C yang benar adalah ...', o: ['<span class="mono">[↑↓] [ ] [ ]</span>', '<span class="mono">[↑] [↑] [ ]</span>', '<span class="mono">[↑] [↓] [ ]</span>', '<span class="mono">[↑↓] [↑↓] [ ]</span>'], a: 1, e: 'C memiliki 2 elektron pada 2p. Menurut kaidah Hund, keduanya menempati orbital berbeda dengan arah spin sama.' },
+    { q: 'Jumlah elektron valensi atom <sub>17</sub>Cl adalah ...', o: ['5', '8', '7', '17'], a: 2, e: 'Konfigurasi Cl: 1s² 2s² 2p⁶ 3s² 3p⁵. Kulit terluar (n = 3) berisi 2 + 5 = 7 elektron.' },
+    { q: 'Konfigurasi elektron <sub>24</sub>Cr yang benar adalah ...', o: ['[Ar] 4s² 3d⁴', '[Ar] 3d⁶', '[Ar] 4s² 3d⁶', '[Ar] 4s¹ 3d⁵'], a: 3, e: 'Cr menyimpang. Subkulit 3d setengah penuh (d⁵) lebih stabil, sehingga satu elektron 4s berpindah ke 3d.' },
+    { q: 'Atom <sub>16</sub>S terletak pada ...', o: ['Periode 2, golongan VIA', 'Periode 3, golongan IVA', 'Periode 4, golongan VIB', 'Periode 3, golongan VIA'], a: 3, e: 'Konfigurasi S: [Ne] 3s² 3p⁴. Kulit terluar n = 3 sehingga periode 3, dan golongan = 10 + (2 + 4) = 16 (VIA).' },
+    { q: 'Notasi singkat konfigurasi elektron <sub>26</sub>Fe adalah ...', o: ['[Ar] 4s² 3d⁴', '[Ar] 3d⁸', '[Ar] 4s² 3d⁶', '[Ar] 4s² 4p⁶'], a: 2, e: 'Fe memiliki 26 elektron. Setelah [Ar] (18 elektron), 8 elektron sisanya mengisi 4s² dan 3d⁶.' },
+    { q: 'Jumlah elektron tidak berpasangan pada atom <sub>7</sub>N adalah ...', o: ['1', '2', '3', '5'], a: 2, e: 'Konfigurasi N: 1s² 2s² 2p³. Tiga elektron 2p menempati tiga orbital terpisah dengan spin sama, jadi ada 3 elektron tidak berpasangan.' }
+  ];
+  var qz = { i: 0, score: 0, picked: null };
+  var box = $('#quizBox');
+  function renderQuiz() {
+    if (qz.i >= QS.length) {
+      var val = Math.round(qz.score * 100 / QS.length);
+      mem.quiz.done = true; mem.quiz.best = Math.max(mem.quiz.best || 0, val); save(); updateProgress();
+      var nm = (mem.name || '').trim();
+      box.innerHTML = '<p class="kicker">Nilai ' + (nm ? esc(nm) : 'kamu') + '</p><div class="score">' + val + '</div>' +
+        '<p style="margin-top:10px">' + qz.score + ' dari ' + QS.length + ' soal benar. Nilai terbaikmu di perangkat ini: ' + mem.quiz.best + '.</p>' +
+        '<p>' + (val >= 80 ? 'Kamu sudah memahami konfigurasi elektron. Coba simulasi unsur lain untuk memperdalam.' : 'Buka kembali Materi dan Simulasi, lalu ulangi kuis ini.') + '</p>' +
+        '<div class="row"><button class="btn" type="button" data-act="restart">Ulangi kuis</button><a class="btn ghost" href="#materi">Buka materi</a></div>';
+      return;
+    }
+    var q = QS[qz.i], L = ['A', 'B', 'C', 'D'], ans = qz.picked !== null;
+    var html = '<div class="qhead"><span>Soal ' + (qz.i + 1) + ' dari ' + QS.length + '</span><span>Benar: ' + qz.score + '</span></div><p style="font-weight:500;margin:0">' + q.q + '</p><div class="opts">';
+    q.o.forEach(function (o, j) {
+      var cls = 'opt';
+      if (ans) { if (j === q.a) cls += ' right'; else if (j === qz.picked) cls += ' wrong'; }
+      html += '<button type="button" class="' + cls + '" data-opt="' + j + '"' + (ans ? ' disabled' : '') + '><span class="l">' + L[j] + '</span><span>' + o + '</span></button>';
+    });
+    html += '</div>';
+    if (ans) {
+      html += '<div class="fb ' + (qz.picked === q.a ? 'ok' : 'bad') + '" aria-live="polite"><b>' + (qz.picked === q.a ? 'Benar.' : 'Belum tepat.') + '</b> ' + q.e + '</div>' +
+        '<div class="row" style="margin-top:12px"><button class="btn" type="button" data-act="next">' + (qz.i === QS.length - 1 ? 'Lihat nilai' : 'Soal berikutnya') + '</button></div>';
+    }
+    box.innerHTML = html;
+  }
+  box.addEventListener('click', function (ev) {
+    var o = ev.target.closest('[data-opt]'), a = ev.target.closest('[data-act]');
+    if (o && qz.picked === null) {
+      qz.picked = +o.dataset.opt;
+      if (qz.picked === QS[qz.i].a) qz.score++;
+      renderQuiz();
+    } else if (a && a.dataset.act === 'next') { qz.i++; qz.picked = null; renderQuiz(); window.scrollTo(0, 0); }
+    else if (a && a.dataset.act === 'restart') { qz = { i: 0, score: 0, picked: null }; renderQuiz(); window.scrollTo(0, 0); }
+  });
+
+  /* ---------- Mulai ---------- */
+  updateProgress(); renderSim(); renderQuiz(); route();
+})();
+</script>
